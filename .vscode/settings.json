@@ -1,0 +1,7 @@
+{
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "git.ignoreLimitWarning": true,
+    "CodeGPT.apiKey": "Anthropic",
+    "java.compile.nullAnalysis.mode": "disabled",
+    "perpo.apiKey": "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"
+}

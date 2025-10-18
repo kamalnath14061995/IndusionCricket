@@ -1,0 +1,12 @@
+- [x] Update navigate call in handleBooking to use 'facility' instead of selectedFacility
+- [x] Change Booking Summary condition to selectedFacility !== null
+- [x] Remove (selectedFacility as any) cast in price display
+- [x] Update total amount calculation condition to selectedFacility !== null && selectedTimeSlot
+- [x] Verify no TypeScript errors remain (syntax error present, but type errors fixed)
+- [x] Test booking flow
+- [x] Implement Recent Bookings and Booking History tabs in Bookings.tsx
+- [x] Add data fetching for user bookings using BookingService
+- [x] Display booking details in Recent Bookings tab
+- [x] Display booking details in Booking History tab
+- [x] Test that bookings appear in Dashboard after booking creation
+- [x] Verify booking details show in Upcoming Bookings, Coaching Sessions, Recent Payments

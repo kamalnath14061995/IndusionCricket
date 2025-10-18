@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Upload Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .loading { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Final Upload Feature Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: File Upload</h2>
+        <input type="file" id="fileInput" accept="image/*">
+        <button onclick="testFileUpload()">Test File Upload</button>
+        <div id="fileResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: URL Upload (Expected to fail due to SSL)</h2>
+        <input type="text" id="urlInput" placeholder="Enter image URL" value="https://drive.google.com/uc?id=1abc123">
+        <button onclick="testUrlUpload()">Test URL Upload</button>
+        <div id="urlResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Local URL (Should work)</h2>
+        <input type="text" id="localUrlInput" placeholder="Enter local URL" value="http://localhost:8080/api/homepage/players">
+        <button onclick="testLocalUrlUpload()">Test Local URL</button>
+        <div id="localUrlResult"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/admin/upload';
+        const token = 'test-token'; // Replace with actual JWT token
+
+        async function testFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('fileResult');
+            
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = '<span class="error">Please select a file first</span>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<span class="loading">Uploading file...</span>';
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                const response = await fetch(`${API_BASE}/image`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const result = await response.text();
+                    resultDiv.innerHTML = `<span class="success">File upload successful: ${result}</span>`;
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<span class="error">File upload failed: ${response.status} ${error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">File upload error: ${error.message}</span>`;
+            }
+        }
+
+        async function testUrlUpload() {
+            const urlInput = document.getElementById('urlInput');
+            const resultDiv = document.getElementById('urlResult');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                resultDiv.innerHTML = '<span class="error">Please enter a URL</span>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<span class="loading">Uploading from URL...</span>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/from-url`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                if (response.ok) {
+                    const result = await response.text();
+                    resultDiv.innerHTML = `<span class="success">URL upload successful: ${result}</span>`;
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<span class="error">URL upload failed: ${response.status} ${error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">URL upload error: ${error.message}</span>`;
+            }
+        }
+
+        async function testLocalUrlUpload() {
+            const urlInput = document.getElementById('localUrlInput');
+            const resultDiv = document.getElementById('localUrlResult');
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                resultDiv.innerHTML = '<span class="error">Please enter a URL</span>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<span class="loading">Testing local URL...</span>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/from-url`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                if (response.ok) {
+                    const result = await response.text();
+                    resultDiv.innerHTML = `<span class="success">Local URL test successful: ${result}</span>`;
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<span class="error">Local URL test failed: ${response.status} ${error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">Local URL test error: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

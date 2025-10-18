@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Test - Fixed</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Test Image Upload (Fixed)</h1>
+    <p class="info">This test uploads images to your backend to avoid CORS issues</p>
+    
+    <input type="file" id="fileInput" accept="image/*">
+    <button onclick="uploadFile()">Upload Test</button>
+    <div id="result"></div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '<p class="info">Uploading...</p>';
+
+                const response = await fetch('http://localhost:8080/api/admin/upload/image', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': 'Bearer YOUR_ACTUAL_TOKEN_HERE' // Replace with actual token
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.text();
+                    resultDiv.innerHTML = `<p class="success">Success! Image uploaded to: ${result}</p>
+                                          <p class="info">Full URL: http://localhost:8080${result}</p>
+                                          <img src="http://localhost:8080${result}" alt="Uploaded image" style="max-width: 300px; margin-top: 10px;">`;
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `<p class="error">Error ${response.status}: ${error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p class="error">Network error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Debug Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Authentication Debug Test</h1>
+    
+    <div class="section">
+        <h2>LocalStorage Tokens</h2>
+        <div id="token-info"></div>
+    </div>
+
+    <div class="section">
+        <h2>Test Upload from URL</h2>
+        <input type="text" id="test-url" placeholder="Enter image URL" style="width: 300px; padding: 5px;">
+        <button onclick="testUpload()">Test Upload</button>
+        <div id="test-result"></div>
+    </div>
+
+    <div class="section">
+        <h2>Manual API Test</h2>
+        <button onclick="testApiCall()">Test API Call</button>
+        <div id="api-result"></div>
+    </div>
+
+    <script>
+        function checkTokens() {
+            const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
+            const refreshToken = localStorage.getItem('refreshToken');
+            
+            let html = `
+                <p><strong>Access Token:</strong> ${accessToken ? 'Present' : 'Missing'}</p>
+                <p><strong>Refresh Token:</strong> ${refreshToken ? 'Present' : 'Missing'}</p>
+            `;
+            
+            if (accessToken) {
+                try {
+                    const parts = accessToken.split('.');
+                    if (parts.length === 3) {
+                        const payload = JSON.parse(atob(parts[1]));
+                        html += `<p><strong>Token Payload:</strong></p>
+                                <pre>${JSON.stringify(payload, null, 2)}</pre>`;
+                        
+                        // Check for ADMIN role
+                        const roles = payload.roles || payload.authorities || [];
+                        const hasAdminRole = roles.includes('ADMIN') || roles.includes('ROLE_ADMIN');
+                        html += `<p><strong>Has ADMIN Role:</strong> <span class="${hasAdminRole ? 'success' : 'error'}">${hasAdminRole}</span></p>`;
+                        
+                        // Check expiration
+                        const exp = payload.exp;
+                        if (exp) {
+                            const now = Math.floor(Date.now() / 1000);
+                            const isExpired = now > exp;
+                            const expiresIn = exp - now;
+                            html += `<p><strong>Token Expired:</strong> <span class="${isExpired ? 'error' : 'success'}">${isExpired}</span></p>`;
+                            html += `<p><strong>Expires in:</strong> ${expiresIn > 0 ? Math.floor(expiresIn / 60) + ' minutes' : 'Expired'}</p>`;
+                        }
+                    }
+                } catch (e) {
+                    html += `<p class="error">Error parsing token: ${e.message}</p>`;
+                }
+            } else {
+                html += '<p class="error">No access token found. Please login first.</p>';
+            }
+            
+            document.getElementById('token-info').innerHTML = html;
+        }
+
+        async function testUpload() {
+            const url = document.getElementById('test-url').value;
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+
+            const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
+            if (!accessToken) {
+                alert('No access token found. Please login first.');
+                return;
+            }
+
+            document.getElementById('test-result').innerHTML = '<p>Testing upload...</p>';
+
+            try {
+                const response = await fetch('http://localhost:8080/api/admin/upload/from-url', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({ url })
+                });
+
+                const result = await response.text();
+                
+                if (response.ok) {
+                    document.getElementById('test-result').innerHTML = `
+                        <p class="success">Success! Uploaded to: ${result}</p>
+                    `;
+                } else {
+                    document.getElementById('test-result').innerHTML = `
+                        <p class="error">Error (${response.status}): ${result}</p>
+                        <p>Response headers:</p>
+                        <pre>${JSON.stringify(Object.fromEntries([...response.headers]), null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('test-result').innerHTML = `
+                    <p class="error">Network error: ${error.message}</p>
+                `;
+            }
+        }
+
+        async function testApiCall() {
+            const accessToken = localStorage.getItem('accessToken') || localStorage.getItem('token');
+            if (!accessToken) {
+                alert('No access token found. Please login first.');
+                return;
+            }
+
+            document.getElementById('api-result').innerHTML = '<p>Testing API call...</p>';
+
+            try {
+                const response = await fetch('http://localhost:8080/api/admin/homepage/players', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                const result = await response.text();
+                
+                if (response.ok) {
+                    document.getElementById('api-result').innerHTML = `
+                        <p class="success">Success! API call worked.</p>
+                        <p>Response:</p>
+                        <pre>${result}</pre>
+                    `;
+                } else {
+                    document.getElementById('api-result').innerHTML = `
+                        <p class="error">Error (${response.status}): ${result}</p>
+                        <p>Response headers:</p>
+                        <pre>${JSON.stringify(Object.fromEntries([...response.headers]), null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('api-result').innerHTML = `
+                    <p class="error">Network error: ${error.message}</p>
+                `;
+            }
+        }
+
+        // Check tokens on page load
+        checkTokens();
+    </script>
+</body>
+</html>
