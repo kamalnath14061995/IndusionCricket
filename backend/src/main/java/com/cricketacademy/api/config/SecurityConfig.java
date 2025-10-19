@@ -55,7 +55,7 @@ public class SecurityConfig {
                                                                 "/api/programs/**",
                                                                 "/api/coaches/**",
                                                                 "/api/homepage/**",
-                                                "/api/reviews/**",
+                                                                "/api/reviews/**",
                                                                 "/api/verify/verify-otp",
                                                                 "/api/payments/config",
                                                                 "/api/payments/methods",
@@ -101,7 +101,8 @@ public class SecurityConfig {
                                                 "https://*.trycloudflare.com", // Cloudflare
                                                 "https://*.railway.app", // Railway
                                                 "https://*.render.com", // Render
-                                                "https://*.fly.dev" // Fly.io
+                                                "https://*.fly.dev", // Fly.io
+                                                 "https://indusion-cricket.vercel.app" // vercel
                                 ));
                 configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                 configuration.setAllowedHeaders(Arrays.asList("*"));
