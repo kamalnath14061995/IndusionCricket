@@ -1,6 +1,0 @@
-com\cricketacademy\api\controller\AuthControllerTest.class
-com\cricketacademy\api\config\TestConfig.class
-com\cricketacademy\api\controller\TestSecurityConfig.class
-com\cricketacademy\api\controller\CoachProgramControllerTest.class
-com\cricketacademy\api\controller\UploadControllerTest.class
-com\cricketacademy\api\service\PaymentServiceTest.class
