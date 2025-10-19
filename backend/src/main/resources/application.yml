@@ -1,0 +1,87 @@
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+# Database Configuration
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/cricket_academy?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: Kamal@146
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: none  # Let Flyway manage schema
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+        # Additional properties
+        temp:
+          use_jdbc_metadata_defaults: false
+
+  # Flyway Configuration (single, consolidated block)
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: false
+    out-of-order: false
+    baseline-version: 1
+  
+  # Jackson Configuration for JSON handling
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+  
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kamalnath146@gmail.com
+    password: jqte nakt blzu rmkd
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Logging Configuration
+logging:
+  level:
+    com.cricketacademy.api: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Application specific properties
+app:
+  jwt:
+    secret: ${JWT_SECRET:Y3JpY2tldGFjYWRlbXlzZWNyZXRrZXl0aGF0aXNhdGxlYXN0MjU2Yml0c2xvbmdmb3JoczI1NmFsZ29yaXRobQ==}
+    expiration: 1200000  # 20 minutes in milliseconds
+    refreshExpiration: 604800000  # 7 days in ms
+  upload:
+    dir: uploads
+  
+  payment:
+    razorpay:
+      key-id: rzp_test_RCHTIPofbIz1gG
+      key-secret: v3GgVh6KzPX9lfafaQE5rxqX
+      webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:}
+      enabled-methods: [card, upi, netbanking, wallet]
+      # Ngrok tunnel URL for local development (update with your ngrok URL)
+      base-url: ${RAZORPAY_BASE_URL:http://localhost:8080}
+    paypal:
+      client-id: ${PAYPAL_CLIENT_ID:}
+      secret: ${PAYPAL_SECRET:}
+      mode: sandbox # or 'live' for production
+      webhook-id: ${PAYPAL_WEBHOOK_ID:}
+    currency: INR
