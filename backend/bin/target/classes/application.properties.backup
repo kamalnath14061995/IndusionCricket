@@ -1,0 +1,43 @@
+# Cashfree credentials (replace with your actual values)
+cashfree.appId=YOUR_CASHFREE_APP_ID
+cashfree.secretKey=YOUR_CASHFREE_SECRET_KEY
+cashfree.env=TEST
+
+# Email Configuration (Gmail SMTP)
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=kamalnath146@gmail.com
+spring.mail.password=nhaotftfgjhgiovp
+
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+spring.mail.properties.mail.smtp.starttls.required=true
+spring.mail.test-connection=false
+
+# Application URL for reset links
+app.base-url=http://localhost:5173
+
+# Database Configuration (H2 in-memory for testing)
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=password
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+# Flyway Configuration (enabled for database initialization)
+spring.flyway.enabled=true
+spring.flyway.locations=classpath:db/migration
+spring.flyway.baseline-on-migrate=true
+spring.flyway.validate-on-migrate=true
+
+# Hibernate Configuration - Let Flyway handle schema creation
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.generate-ddl=false
+spring.jpa.defer-datasource-initialization=false
+
+# Prevent circular dependency
+spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+
+# Additional Flyway configuration to prevent circular dependency
+spring.flyway.check-location=false

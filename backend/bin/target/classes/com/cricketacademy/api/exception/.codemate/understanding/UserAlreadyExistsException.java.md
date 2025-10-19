@@ -1,0 +1,3 @@
+**High-Level Documentation**
+
+This code defines a custom exception named UserAlreadyExistsException within the com.cricketacademy.api.exception package. It is designed to be thrown when an attempt is made to register a user who already exists in the system. The exception extends RuntimeException, allowing it to be used as an unchecked exception. Two constructors are provided: one accepts a custom error message, and the other accepts both a message and a causal Throwable, supporting more detailed error reporting and chaining.
